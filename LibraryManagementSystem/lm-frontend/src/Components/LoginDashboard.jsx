@@ -1,29 +1,45 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-export default function LoginDashboard({ setRole }) {
+export default function LoginDashboard({ setRole, setToken, setUserId }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    if (email === "admin@library.com" && password === "admin123") {
-      setRole("ADMIN");
-      navigate("/admin");
-    } else if (email === "student1@griet.com" && password === "student123") {
-      setRole("STUDENT");
-      navigate("/student");
-    } else {
-      alert("Invalid credentials. Try again!");
-    }
-  };
+  const handleLogin = async () => {
+  try {
+    const response = await axios.post("http://localhost:8080/api/auth/login", {
+      email,
+      password,
+    });
+
+    const { token, role, id } = response.data;  // include userId
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("role", role);
+    localStorage.setItem("userId", id);          // ok, stores as string
+     
+
+    setRole(role);
+    setToken(token);
+    setUserId(Number(id)); 
+
+    if (role === "ADMIN") navigate("/admin");
+    else if (role === "STUDENT") navigate("/student");
+    else alert("Unknown role received.");
+
+  } catch (error) {
+    console.error(error);
+    alert("Invalid credentials! Please try again.");
+  }
+};
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100 bg-light">
       <div className="card shadow p-4" style={{ width: "380px", borderRadius: "12px" }}>
         <h2 className="text-center mb-4 text-primary">Library Login</h2>
 
-        {/* Email */}
         <div className="form-group mb-3">
           <input
             type="email"
@@ -34,7 +50,6 @@ export default function LoginDashboard({ setRole }) {
           />
         </div>
 
-        {/* Password */}
         <div className="form-group mb-3">
           <input
             type="password"
@@ -45,20 +60,9 @@ export default function LoginDashboard({ setRole }) {
           />
         </div>
 
-        {/* Login Button */}
-        <button
-          className="btn btn-primary w-100 mb-3"
-          onClick={handleLogin}
-        >
+        <button className="btn btn-primary w-100 mb-3" onClick={handleLogin}>
           Login
         </button>
-
-        {/* Fake Login Info */}
-        {/* <div className="alert alert-info small text-center" role="alert">
-          <strong>Test Credentials:</strong> <br />
-          👩‍💼 <b>Admin</b> → admin@library.com / admin123 <br />
-          🎓 <b>Student</b> → student1@griet.com / student123
-        </div> */}
       </div>
     </div>
   );

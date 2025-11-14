@@ -1,5 +1,6 @@
 package com.majorproj.LibraryManagementSystem.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -14,11 +15,13 @@ public class IssuedBook {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonBackReference
     private User user; // who borrowed
 
     @ManyToOne
     @JoinColumn(name = "book_id")
-    private Book book; // which book
+    @JsonBackReference
+    private Book book;
 
     private LocalDate issueDate;
 

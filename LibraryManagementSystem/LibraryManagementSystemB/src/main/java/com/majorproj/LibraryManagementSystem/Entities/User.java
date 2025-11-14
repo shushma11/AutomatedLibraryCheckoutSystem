@@ -1,5 +1,6 @@
 package com.majorproj.LibraryManagementSystem.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -12,7 +13,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String fullName;
+    private String name;
 
     @Column(unique = true, nullable = false)
     private String email;
@@ -30,14 +31,15 @@ public class User {
 
     // Relationship: one student can have many issued books
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    @JsonManagedReference
     private List<IssuedBook> issuedBooks;
 
     public User() {
     }
 
-    public User(Long id, String fullName, String email, String password, Role role, String rollNo, String year, String branch, String section, List<IssuedBook> issuedBooks) {
+    public User(Long id, String name, String email, String password, Role role, String rollNo, String year, String branch, String section, List<IssuedBook> issuedBooks) {
         this.id = id;
-        this.fullName = fullName;
+        this.name = name;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -48,6 +50,8 @@ public class User {
         this.issuedBooks = issuedBooks;
     }
 
+
+
     public Long getId() {
         return id;
     }
@@ -56,12 +60,12 @@ public class User {
         this.id = id;
     }
 
-    public String getFullName() {
-        return fullName;
+    public String getName() {
+        return name;
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setFullName(String name) {
+        this.name = name;
     }
 
     public String getEmail() {

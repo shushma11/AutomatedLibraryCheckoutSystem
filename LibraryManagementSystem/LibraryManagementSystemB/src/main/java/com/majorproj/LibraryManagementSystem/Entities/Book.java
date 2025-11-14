@@ -1,6 +1,10 @@
 package com.majorproj.LibraryManagementSystem.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "books")
@@ -20,22 +24,24 @@ public class Book {
 
     private String category; // example: Programming, Fiction, etc.
 
-    // For real-time tracking of who borrowed it
-    @ManyToOne
-    @JoinColumn(name = "borrowed_by_id")
-    private User borrowedBy;
+    private int count;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL)
+    @JsonManagedReference
+    private List<IssuedBook> issuedBooks = new ArrayList<>();
+
+
 
     public Book() {
     }
 
-    public Book(Long id, String title, String author, String isbn, boolean available, String category, User borrowedBy) {
+    public Book(Long id, String title, String author, String isbn, boolean available, String category, int count) {
         this.id = id;
         this.title = title;
         this.author = author;
         this.isbn = isbn;
         this.available = available;
         this.category = category;
-        this.borrowedBy = borrowedBy;
+        this.count = count;
     }
 
     public Long getId() {
@@ -86,11 +92,11 @@ public class Book {
         this.category = category;
     }
 
-    public User getBorrowedBy() {
-        return borrowedBy;
+    public int getCount() {
+        return count;
     }
 
-    public void setBorrowedBy(User borrowedBy) {
-        this.borrowedBy = borrowedBy;
+    public void setCount(int count) {
+        this.count = count;
     }
 }
