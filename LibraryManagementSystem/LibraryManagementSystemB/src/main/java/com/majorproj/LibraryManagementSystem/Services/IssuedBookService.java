@@ -4,6 +4,7 @@ import com.majorproj.LibraryManagementSystem.Entities.*;
 import com.majorproj.LibraryManagementSystem.Repositories.*;
 import com.majorproj.LibraryManagementSystem.dto.IssuedBookResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -124,4 +125,64 @@ public class IssuedBookService {
                 .map(IssuedBookResponseDTO::new)
                 .collect(Collectors.toList());
     }
+
+    public ResponseEntity<String> issueBook2(Long userId, Long bookId, String rollNumber) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getRollNo().equals(rollNumber)) {
+            return ResponseEntity.badRequest().body("Roll number does not match your account!");
+        }
+
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        if (book.getCount() <= 0) {
+            return ResponseEntity.badRequest().body("Book is currently not available!");
+        }
+
+        // Reduce book count
+        book.setCount(book.getCount() - 1);
+        if (book.getCount() == 0) {
+            book.setAvailable(false);
+        }
+        bookRepository.save(book);
+
+        // Save transaction
+        IssuedBook record = new IssuedBook();
+        record.setUser(user);
+        record.setBook(book);
+        record.setIssueDate(LocalDate.now());
+        issuedBookRepository.save(record);
+
+        return ResponseEntity.ok("Book issued successfully!");
+    }
+
+    public ResponseEntity<String> returnBook2(Long userId, Long bookId, String rollNumber) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!user.getRollNo().equals(rollNumber)) {
+            return ResponseEntity.badRequest().body("Roll number does not match your account!");
+        }
+
+        // Existing returnBook logic
+        IssuedBook issuedBook = issuedBookRepository.findByUserAndBookAndReturnedFalse(user,
+                        bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found")))
+                .orElseThrow(() -> new RuntimeException("This user has not issued this book or already returned it"));
+
+        issuedBook.setReturned(true);
+        issuedBook.setReturnDate(LocalDate.now());
+        issuedBookRepository.save(issuedBook);
+
+        Book book = issuedBook.getBook();
+        book.setCount(book.getCount() + 1);
+        book.setAvailable(true);
+        bookRepository.save(book);
+
+        return ResponseEntity.ok("Book returned successfully!");
+    }
+
+
 }

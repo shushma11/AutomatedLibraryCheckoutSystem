@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddBookForm from "./AddBookForm";
 import UpdateBookForm from "./UpdateBookForm";
+import BookIssueModal from "./BookIssueModel";
 
 export default function AllBooksPage({ role }) {
   const [books, setBooks] = useState([]);
@@ -11,6 +12,9 @@ export default function AllBooksPage({ role }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All Branches");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+const [showIssueModal, setShowIssueModal] = useState(false);
+
 
   const userId = Number(localStorage.getItem("userId"));
 
@@ -211,13 +215,17 @@ export default function AllBooksPage({ role }) {
 
                   {/* Student take book button */}
                   {role === "STUDENT" && userId && book.available && (
-                    <button
-                      className="btn btn-primary mt-auto"
-                      onClick={() => handleTakeBook(book.id)}
-                    >
-                      📖 Take Book
-                    </button>
-                  )}
+  <button
+    className="btn btn-primary mt-auto"
+    onClick={() => {
+      setSelectedBook(book);
+      setShowIssueModal(true);
+    }}
+  >
+    📖 Take Book
+  </button>
+)}
+
                 </div>
               </div>
             </div>
@@ -226,6 +234,17 @@ export default function AllBooksPage({ role }) {
           <p className="text-center mt-5">No books found.</p>
         )}
       </div>
+
+      {showIssueModal && (
+  <BookIssueModal
+    book={selectedBook}
+    userId={userId}
+    onClose={() => setShowIssueModal(false)}
+    onIssued={fetchBooks}
+  />
+)}
+
     </div>
-  );
+  
+);
 }

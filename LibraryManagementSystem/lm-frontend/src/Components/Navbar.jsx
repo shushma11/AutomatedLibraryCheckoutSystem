@@ -1,5 +1,6 @@
 import React from "react";
 import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import logo from "../assets/images/griet_logo.jpeg";
 
 export default function Navbar({ role, onLogout }) {
   const navigate = useNavigate();
@@ -16,9 +17,12 @@ export default function Navbar({ role, onLogout }) {
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
       <div className="container-fluid">
         <Link className="navbar-brand fw-bold fs-4 d-flex align-items-center" to="/">
-          <span role="img" aria-label="book">📚</span>
-          <span className="ms-2">Library Management System</span>
-        </Link>
+  <img 
+    src={logo} 
+    alt="GRIET Logo" 
+    style={{ height: "55px", width: "350px", borderRadius:"5px"}} 
+  />
+</Link>
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto align-items-center">

@@ -10,7 +10,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -63,6 +66,19 @@ public class UserService {
     public List<UserDTO> getAllStudents() {
         List<User> students = userRepository.findByRole(Role.STUDENT);
         return students.stream().map(UserDTO::new).collect(Collectors.toList());
+    }
+
+    public Map<String, String> getUserBasicInfo(Long userId) {
+        Optional<User> userOpt = userRepository.findById(userId);
+        if (userOpt.isPresent()) {
+            User user = userOpt.get();
+            Map<String, String> response = new HashMap<>();
+            response.put("name", user.getName());
+            response.put("rollNumber", user.getRollNo());
+            return response;
+        } else {
+            return null; // or throw exception
+        }
     }
 
 }
