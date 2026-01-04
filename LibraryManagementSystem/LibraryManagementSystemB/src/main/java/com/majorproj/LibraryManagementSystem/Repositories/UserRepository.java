@@ -12,4 +12,9 @@ public interface UserRepository extends JpaRepository<User,Long> {
     boolean existsByEmail(String email);
 
     List<User> findByRole(Role role);
+
+
+    Optional<User> findByRfidTagId(String rfidTagId);
+
+    boolean existsByRfidTagId(String rfidTagId);
 }

@@ -29,6 +29,10 @@ public class User {
     private String branch;
     private String section;
 
+    @Column(unique = true)
+    private String rfidTagId;
+
+
     // Relationship: one student can have many issued books
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -37,7 +41,7 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, Role role, String rollNo, String year, String branch, String section, List<IssuedBook> issuedBooks) {
+    public User(Long id, String name, String email, String password, Role role, String rollNo, String year, String branch, String section, String rfidTagId, List<IssuedBook> issuedBooks) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -47,10 +51,9 @@ public class User {
         this.year = year;
         this.branch = branch;
         this.section = section;
+        this.rfidTagId = rfidTagId;
         this.issuedBooks = issuedBooks;
     }
-
-
 
     public Long getId() {
         return id;
@@ -130,5 +133,17 @@ public class User {
 
     public void setIssuedBooks(List<IssuedBook> issuedBooks) {
         this.issuedBooks = issuedBooks;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getRfidTagId() {
+        return rfidTagId;
+    }
+
+    public void setRfidTagId(String rfidTagId) {
+        this.rfidTagId = rfidTagId;
     }
 }

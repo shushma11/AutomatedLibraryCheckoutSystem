@@ -57,6 +57,7 @@ public class UserService {
                 req.getYear(),
                 req.getBranch(),
                 req.getSection(),
+                req.getRfidTagId(),
                 null
         );
 
@@ -80,5 +81,27 @@ public class UserService {
             return null; // or throw exception
         }
     }
+
+    public void assignRfidToUser(Long userId, String rfidTagId) {
+
+        // 1️⃣ Check if RFID is already assigned
+        Optional<User> existingUser = userRepository.findByRfidTagId(rfidTagId);
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("RFID already assigned to another student");
+        }
+
+        // 2️⃣ Fetch student
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // 3️⃣ Assign RFID
+        user.setRfidTagId(rfidTagId);
+        userRepository.save(user);
+    }
+
+    public boolean isRfidAssigned(String rfidTagId) {
+        return userRepository.findByRfidTagId(rfidTagId).isPresent();
+    }
+
 
 }

@@ -5,11 +5,9 @@ import com.majorproj.LibraryManagementSystem.Services.UserService;
 import com.majorproj.LibraryManagementSystem.dto.UserDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,5 +29,28 @@ public class UserController {
             return ResponseEntity.status(404).body("User not found");
         }
     }
+
+    @PostMapping("/{userId}/assign-rfid")
+    public ResponseEntity<?> assignRfid(
+            @PathVariable Long userId,
+            @RequestBody Map<String, String> request) {
+
+        userService.assignRfidToUser(userId, request.get("rfidTagId"));
+        return ResponseEntity.ok("RFID assigned successfully");
+    }
+
+    @PostMapping("/check")
+    public ResponseEntity<?> checkRfid(@RequestBody Map<String, String> request) {
+        String uid = request.get("uid");
+        boolean assigned = userService.isRfidAssigned(uid);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("uid", uid);
+        response.put("status", assigned ? "ASSIGNED" : "UNASSIGNED");
+
+        return ResponseEntity.ok(response);
+    }
+
+
 
 }

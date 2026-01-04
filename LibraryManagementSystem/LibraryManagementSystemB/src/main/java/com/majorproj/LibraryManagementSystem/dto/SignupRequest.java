@@ -15,6 +15,8 @@ public class SignupRequest {
 
     private String secretKey;
 
+    private String rfidTagId;
+
     public String getName() {
         return name;
     }
@@ -85,5 +87,14 @@ public class SignupRequest {
 
     public void setSecretKey(String secretKey) {
         this.secretKey = secretKey;
+    }
+
+
+    public String getRfidTagId() {
+        return rfidTagId;
+    }
+
+    public void setRfidTagId(String rfidTagId) {
+        this.rfidTagId = rfidTagId;
     }
 }
