@@ -11,7 +11,8 @@ export default function LoginSignup() {
   const [year, setYear] = useState("");
   const [branch, setBranch] = useState("");
   const [section, setSection] = useState("");
-  const [secretKey, setSecretKey] = useState(""); // 👈 new field for admin key
+  const [secretKey, setSecretKey] = useState(""); // now required for both roles
+  const [rfidTagId, setRfidTagId] = useState(""); // for students
 
   const navigate = useNavigate();
 
@@ -23,25 +24,29 @@ export default function LoginSignup() {
         email,
         password,
         role,
-        rollNo: rollno,
-        year,
-        branch,
-        section,
+        secretKey, // always required
       };
 
-      // Only include secret key if Admin is selected
-      if (role === "Admin") {
-        payload.secretKey = secretKey;
+      // Add student-specific fields
+      if (role === "Student") {
+        payload.rollNo = rollno;
+        payload.year = year;
+        payload.branch = branch;
+        payload.section = section;
+        payload.rfidTagId = rfidTagId; // student RFID
       }
 
-      const response = await axios.post("http://localhost:8080/api/auth/signup", payload);
+      const response = await axios.post(
+        "http://localhost:8080/api/auth/signup",
+        payload
+      );
 
       alert("Signup successful! You can now log in.");
       navigate("/login");
     } catch (error) {
       console.error("Signup Error:", error);
       if (error.response && error.response.data) {
-        alert(error.response.data.message || "Signup failed! Admin Key is incorrect");
+        alert(error.response.data.message || "Signup failed! Secret key is incorrect");
       } else {
         alert("Signup failed! Please check your details.");
       }
@@ -73,7 +78,7 @@ export default function LoginSignup() {
           onChange={(e) => setPname(e.target.value)}
         />
 
-        {/* 👇 Show extra fields for Student */}
+        {/* Student-specific fields */}
         {role === "Student" && (
           <>
             <input
@@ -104,19 +109,25 @@ export default function LoginSignup() {
               value={section}
               onChange={(e) => setSection(e.target.value)}
             />
+            {/* RFID field */}
+            <input
+              type="text"
+              className="form-control mb-3"
+              placeholder="RFID Tag ID"
+              value={rfidTagId}
+              onChange={(e) => setRfidTagId(e.target.value)}
+            />
           </>
         )}
 
-        {/* 👇 Show secret key input if Admin */}
-        {role === "Admin" && (
-          <input
-            type="password"
-            className="form-control mb-3"
-            placeholder="Enter Admin Secret Key"
-            value={secretKey}
-            onChange={(e) => setSecretKey(e.target.value)}
-          />
-        )}
+        {/* Secret key input for both roles */}
+        <input
+          type="password"
+          className="form-control mb-3"
+          placeholder="Enter Secret Key"
+          value={secretKey}
+          onChange={(e) => setSecretKey(e.target.value)}
+        />
 
         {/* Email */}
         <input
