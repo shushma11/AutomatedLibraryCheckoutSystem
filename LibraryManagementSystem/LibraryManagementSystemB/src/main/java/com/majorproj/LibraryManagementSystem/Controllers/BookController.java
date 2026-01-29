@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/books")
@@ -85,6 +86,32 @@ public class BookController {
         return ResponseEntity.ok("Book deleted successfully");
     }
 
+    @PostMapping("/scan")
+    public ResponseEntity<?> scanBook(@RequestBody ScanBookRequest request) {
+
+        Book book = bookService.getBookByIsbn(request.getIsbn())
+                .orElseThrow(() ->
+                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Book not found"));
+
+        if (book.getCount() <= 0) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of("message", "Book not available"));
+        }
+
+// return book info including available count
+        Map<String, Object> response = Map.of(
+                "id", book.getId(),
+                "title", book.getTitle(),
+                "author", book.getAuthor(),
+                "isbn", book.getIsbn(),
+                "availableCount", book.getCount()
+        );
+
+        return ResponseEntity.ok(response);
+
+    }
+
     // DTO for Request
     public static class BookRequest {
         private String title;
@@ -121,4 +148,17 @@ public class BookController {
             this.count = count;
         }
     }
+    public static class ScanBookRequest {
+        private String isbn;
+        private String rollNo;
+
+        public String getIsbn() { return isbn; }
+        public void setIsbn(String isbn) { this.isbn = isbn; }
+
+        public String getRollNo() { return rollNo; }
+        public void setRollNo(String rollNo) { this.rollNo = rollNo; }
+    }
+
+
+
 }

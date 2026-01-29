@@ -13,6 +13,11 @@ public class IssuedBookResponseDTO {
     private String bookTitle;
     private String bookAuthor;
 
+    private String isbn;
+
+    private Long bookId;  // Add this
+
+
     public IssuedBookResponseDTO(IssuedBook issuedBook) {
         this.id = issuedBook.getId();
         this.issueDate = issuedBook.getIssueDate().toString();
@@ -22,6 +27,25 @@ public class IssuedBookResponseDTO {
         this.userEmail = issuedBook.getUser().getEmail();
         this.bookTitle = issuedBook.getBook().getTitle();
         this.bookAuthor = issuedBook.getBook().getAuthor();
+        this.isbn = issuedBook.getBook().getIsbn();
+        this.bookId = issuedBook.getBook().getId();  // Actual book database ID
+
+    }
+
+    public Long getBookId() {
+        return bookId;
+    }
+
+    public void setBookId(Long bookId) {
+        this.bookId = bookId;
+    }
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
     }
 
     public Long getId() {

@@ -8,4 +8,5 @@ public interface RfidRecordRepository extends JpaRepository<RfidRecord, Long> {
 
     // Find last record of a user where exitTime is NULL (means currently inside)
     Optional<RfidRecord> findTopByUserIdAndExitTimeIsNullOrderByEntryTimeDesc(Long userId);
+    RfidRecord findTopByUserRollNoOrderByEntryTimeDesc(String rollNo);
 }

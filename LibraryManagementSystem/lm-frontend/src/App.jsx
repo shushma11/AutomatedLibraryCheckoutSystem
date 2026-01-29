@@ -13,6 +13,8 @@ import StudentList from "./Components/StudentList";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import TransactionHistory from "./Components/TransactionHistory";
 import axios from "axios";
+import BookScan from "./Components/BookScan";
+import ReturnBook from "./Components/ReturnBook";
 
 function App() {
   const [role, setRole] = useState(localStorage.getItem("role"));
@@ -90,6 +92,7 @@ function App() {
           />
         } />
         <Route path="/library-info" element={<LibraryInfo />} />
+        <Route path="/scan-book" element={<BookScan />} />
         <Route path="/issued-books" element={
           <IssuedBooks userId={userId} issuedBooks={issuedBooks} />
         } />
@@ -101,6 +104,8 @@ function App() {
     <TransactionHistory />
   </ProtectedRoute>
 } />
+
+      <Route path="/return-book" element={<ReturnBook />} />
 
       </Routes>
     </Router>

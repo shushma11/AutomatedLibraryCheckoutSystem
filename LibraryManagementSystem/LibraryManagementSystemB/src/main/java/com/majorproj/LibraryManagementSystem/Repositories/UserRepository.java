@@ -17,4 +17,6 @@ public interface UserRepository extends JpaRepository<User,Long> {
     Optional<User> findByRfidTagId(String rfidTagId);
 
     boolean existsByRfidTagId(String rfidTagId);
+
+    Optional<Object> findByRollNo(String rollNo);
 }

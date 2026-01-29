@@ -51,6 +51,21 @@ public class UserController {
         return ResponseEntity.ok(response);
     }
 
+    @PostMapping("/is-inside-library")
+    public ResponseEntity<?> isUserInsideLibrary(@RequestBody Map<String, String> request) {
+
+        String rollNo = request.get("rollNo"); // extract rollNo from JSON
+        boolean inside = userService.isUserInsideLibrary(rollNo);
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("rollNo", rollNo);
+        response.put("insideLibrary", inside);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
 
 }

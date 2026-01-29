@@ -1,7 +1,9 @@
 package com.majorproj.LibraryManagementSystem.Services;
 
+import com.majorproj.LibraryManagementSystem.Entities.RfidRecord;
 import com.majorproj.LibraryManagementSystem.Entities.Role;
 import com.majorproj.LibraryManagementSystem.Entities.User;
+import com.majorproj.LibraryManagementSystem.Repositories.RfidRecordRepository;
 import com.majorproj.LibraryManagementSystem.Repositories.UserRepository;
 import com.majorproj.LibraryManagementSystem.dto.SignupRequest;
 import com.majorproj.LibraryManagementSystem.dto.UserDTO;
@@ -23,7 +25,8 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-
+    @Autowired
+    private RfidRecordRepository rfidRecordRepository;
     @Autowired
     private PasswordEncoder passwordEncoder;
 
@@ -101,6 +104,17 @@ public class UserService {
 
     public boolean isRfidAssigned(String rfidTagId) {
         return userRepository.findByRfidTagId(rfidTagId).isPresent();
+    }
+
+    public boolean isUserInsideLibrary(String rollNo) {
+
+        // Get last RFID record for the user
+        RfidRecord lastRecord =
+                rfidRecordRepository
+                        .findTopByUserRollNoOrderByEntryTimeDesc(rollNo);
+
+        // If last entry exists and exitTime is null → inside
+        return lastRecord != null && lastRecord.getExitTime() == null;
     }
 
 

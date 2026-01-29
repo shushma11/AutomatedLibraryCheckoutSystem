@@ -17,4 +17,5 @@ public interface IssuedBookRepository extends JpaRepository<IssuedBook, Long> {
     Optional<IssuedBook> findByIdAndUser(Long id, User user);
 
 
+    boolean existsByUserAndBookAndReturnedFalse(User user, Book book);
 }

@@ -35,6 +35,8 @@ export default function StudentDashboard({ userId }) {
       const res = await axios.get(`http://localhost:8080/api/user/${userId}`);
       console.log(res.data);
       setStudent(res.data);
+
+      localStorage.setItem("rollNo", res.data.rollNumber);
     } catch (err) {
       console.error("Error fetching student:", err);
     }
@@ -63,6 +65,9 @@ export default function StudentDashboard({ userId }) {
           </Link>
           <Link to="/issued-books" className="btn btn-outline-warning btn-lg rounded-pill shadow-sm">
             📕 My Issued Books
+          </Link>
+           <Link to="/scan-book" className="btn btn-outline-secondary btn-lg rounded-pill shadow-sm">
+            📕 Scan a Book
           </Link>
         </div>
       </div>

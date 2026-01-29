@@ -48,12 +48,32 @@ public class IssuedBookController {
     }
 
 
-    @PutMapping("/return/{userId}/{bookId}")
+    @PostMapping("/return/{userId}/{bookId}")
     public ResponseEntity<String> returnBook(@PathVariable Long userId,
                                              @PathVariable Long bookId,
                                              @RequestBody Map<String,String> body) {
         String rollNo = body.get("rollNumber");
         return issuedBookService.returnBook2(userId, bookId, rollNo);
     }
+
+    @PostMapping("/issue-by-isbn")
+    public ResponseEntity<String> issueBookByIsbn(@RequestBody Map<String, String> request) {
+
+        String isbn = request.get("isbn");
+        String rollNo = request.get("rollNo");
+
+        return issuedBookService.issueBookByIsbn(isbn, rollNo);
+    }
+
+
+    @PutMapping("/return-by-isbn")
+    public ResponseEntity<String> returnBookByIsbn(@RequestBody Map<String, String> request) {
+
+        String isbn = request.get("isbn");
+        String rollNo = request.get("rollNo");
+
+        return issuedBookService.returnBookByIsbn(isbn, rollNo);
+    }
+
 
 }

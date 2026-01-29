@@ -3,7 +3,9 @@ package com.majorproj.LibraryManagementSystem.Services;
 import com.majorproj.LibraryManagementSystem.Entities.*;
 import com.majorproj.LibraryManagementSystem.Repositories.*;
 import com.majorproj.LibraryManagementSystem.dto.IssuedBookResponseDTO;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -168,6 +170,7 @@ public class IssuedBookService {
         }
 
         // Existing returnBook logic
+        System.out.println("Book ID 173: "+bookId);
         IssuedBook issuedBook = issuedBookRepository.findByUserAndBookAndReturnedFalse(user,
                         bookRepository.findById(bookId).orElseThrow(() -> new RuntimeException("Book not found")))
                 .orElseThrow(() -> new RuntimeException("This user has not issued this book or already returned it"));
@@ -183,6 +186,71 @@ public class IssuedBookService {
 
         return ResponseEntity.ok("Book returned successfully!");
     }
+
+    @Transactional
+    public ResponseEntity<String> issueBookByIsbn(String isbn, String rollNo) {
+
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        if (book.getCount() <= 0) {
+            return ResponseEntity.badRequest().body("Book not available");
+        }
+
+        User user = (User) userRepository.findByRollNo(rollNo)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        //!Prevent duplicate issue
+        boolean alreadyIssued = issuedBookRepository
+                .existsByUserAndBookAndReturnedFalse(user, book);
+
+        if (alreadyIssued) {
+            return ResponseEntity.badRequest().body("Book already issued to this user");
+        }
+
+        // Issue book
+        IssuedBook issuedBook = new IssuedBook();
+        issuedBook.setUser(user);
+        issuedBook.setBook(book);
+        issuedBook.setIssueDate(LocalDate.now());
+        issuedBook.setReturned(false);
+
+        issuedBookRepository.save(issuedBook);
+
+        // Update book count
+        book.setCount(book.getCount() - 1);
+        book.setAvailable(book.getCount() > 0);
+        bookRepository.save(book);
+
+        return ResponseEntity.ok("Book issued successfully");
+    }
+
+    @Transactional
+    public ResponseEntity<String> returnBookByIsbn(String isbn, String rollNo) {
+
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new RuntimeException("Book not found"));
+
+        User user = (User) userRepository.findByRollNo(rollNo)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        IssuedBook issuedBook = issuedBookRepository
+                .findByUserAndBookAndReturnedFalse(user, book)
+                .orElseThrow(() -> new RuntimeException("No active issue found"));
+
+        issuedBook.setReturned(true);
+        issuedBook.setReturnDate(LocalDate.now());
+        issuedBookRepository.save(issuedBook);
+
+        // Update book count
+        book.setCount(book.getCount() + 1);
+        book.setAvailable(true);
+        bookRepository.save(book);
+
+        return ResponseEntity.ok("Book returned successfully");
+    }
+
+
 
 
 }
