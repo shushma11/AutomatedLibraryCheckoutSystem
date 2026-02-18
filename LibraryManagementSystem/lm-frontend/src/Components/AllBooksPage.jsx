@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import AddBookForm from "./AddBookForm";
 import UpdateBookForm from "./UpdateBookForm";
-import BookIssueModal from "./BookIssueModel";
+import { useNavigate } from "react-router-dom";
 
 export default function AllBooksPage({ role }) {
   const [books, setBooks] = useState([]);
@@ -12,10 +12,8 @@ export default function AllBooksPage({ role }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All Branches");
   const [onlyAvailable, setOnlyAvailable] = useState(false);
-  const [selectedBook, setSelectedBook] = useState(null);
-const [showIssueModal, setShowIssueModal] = useState(false);
 
-
+  const navigate = useNavigate();
   const userId = Number(localStorage.getItem("userId"));
 
   useEffect(() => {
@@ -29,8 +27,7 @@ const [showIssueModal, setShowIssueModal] = useState(false);
   const fetchBooks = async () => {
     try {
       const response = await axios.get("http://localhost:8080/api/books/all");
-      const data = Array.isArray(response.data) ? response.data : [];
-      setBooks(data);
+      setBooks(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error("Error fetching books:", error);
       alert("Failed to load books.");
@@ -40,7 +37,6 @@ const [showIssueModal, setShowIssueModal] = useState(false);
   const filterBooks = () => {
     let temp = books;
 
-    // Search by title or author
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       temp = temp.filter(
@@ -50,12 +46,10 @@ const [showIssueModal, setShowIssueModal] = useState(false);
       );
     }
 
-    // Filter by category
     if (categoryFilter !== "All Branches") {
       temp = temp.filter((b) => b.category === categoryFilter);
     }
 
-    // Show only available
     if (onlyAvailable) {
       temp = temp.filter((b) => b.available);
     }
@@ -63,16 +57,20 @@ const [showIssueModal, setShowIssueModal] = useState(false);
     setFilteredBooks(temp);
   };
 
-  const uniqueCategories = ["All Branches", ...new Set(books.map((b) => b.category))];
+  const uniqueCategories = [
+    "All Branches",
+    ...new Set(books.map((b) => b.category)),
+  ];
 
   const handleDelete = async (bookId) => {
     const secretKey = prompt("Enter Admin Secret Key to Delete Book:");
     if (!secretKey) return;
 
     try {
-      await axios.delete(`http://localhost:8080/api/books/delete/${bookId}`, {
-        params: { secretKey },
-      });
+      await axios.delete(
+        `http://localhost:8080/api/books/delete/${bookId}`,
+        { params: { secretKey } }
+      );
       alert("Book deleted successfully!");
       fetchBooks();
     } catch (error) {
@@ -81,34 +79,11 @@ const [showIssueModal, setShowIssueModal] = useState(false);
     }
   };
 
-  const handleTakeBook = async (bookId) => {
-    if (!userId) {
-      alert("User not logged in!");
-      return;
-    }
-    try {
-      const res = await axios.post(
-        `http://localhost:8080/api/issued/issue/${userId}/${bookId}`
-      );
-      alert(res.data);
-
-      setBooks((prev) =>
-        prev.map((b) =>
-          b.id === bookId
-            ? { ...b, count: b.count > 0 ? b.count - 1 : 0, available: b.count > 1 }
-            : b
-        )
-      );
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data || "Error issuing book");
-    }
-  };
-
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="fw-bold text-primary">📚 All Books</h2>
+
         {role === "ADMIN" && !editingBook && (
           <button
             className="btn btn-success"
@@ -128,6 +103,7 @@ const [showIssueModal, setShowIssueModal] = useState(false);
           }}
         />
       )}
+
       {editingBook && role === "ADMIN" && (
         <UpdateBookForm
           book={editingBook}
@@ -150,6 +126,7 @@ const [showIssueModal, setShowIssueModal] = useState(false);
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+
         <div className="col-md-3 mb-2">
           <select
             className="form-select"
@@ -163,6 +140,7 @@ const [showIssueModal, setShowIssueModal] = useState(false);
             ))}
           </select>
         </div>
+
         <div className="col-md-3 mb-2 d-flex align-items-center">
           <input
             type="checkbox"
@@ -183,10 +161,11 @@ const [showIssueModal, setShowIssueModal] = useState(false);
             <div className="col-md-4 mb-4" key={book.id}>
               <div className="card shadow-lg h-100 border-0">
                 <div className="card-body d-flex flex-column">
-                  <h5 className="card-title text-dark fw-bold">{book.title}</h5>
+                  <h5 className="card-title fw-bold">{book.title}</h5>
                   <p className="text-muted mb-1">✍️ Author: {book.author}</p>
                   <p className="text-muted mb-1">📗 Category: {book.category}</p>
                   <p className="text-muted mb-1">🔢 Count: {book.count}</p>
+
                   <p
                     className={`fw-semibold ${
                       book.available ? "text-success" : "text-danger"
@@ -195,7 +174,7 @@ const [showIssueModal, setShowIssueModal] = useState(false);
                     {book.available ? "✅ Available" : "❌ Not Available"}
                   </p>
 
-                  {/* Admin buttons */}
+                  {/* Admin Controls */}
                   {role === "ADMIN" && (
                     <div className="mt-auto d-flex justify-content-between">
                       <button
@@ -213,19 +192,15 @@ const [showIssueModal, setShowIssueModal] = useState(false);
                     </div>
                   )}
 
-                  {/* Student take book button */}
+                  {/* Student → Scan Book */}
                   {role === "STUDENT" && userId && book.available && (
-  <button
-    className="btn btn-primary mt-auto"
-    onClick={() => {
-      setSelectedBook(book);
-      setShowIssueModal(true);
-    }}
-  >
-    📖 Take Book
-  </button>
-)}
-
+                    <button
+                      className="btn btn-primary mt-auto"
+                      onClick={() => navigate("/scan-book")}
+                    >
+                      📖 Take Book
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
@@ -234,17 +209,6 @@ const [showIssueModal, setShowIssueModal] = useState(false);
           <p className="text-center mt-5">No books found.</p>
         )}
       </div>
-
-      {showIssueModal && (
-  <BookIssueModal
-    book={selectedBook}
-    userId={userId}
-    onClose={() => setShowIssueModal(false)}
-    onIssued={fetchBooks}
-  />
-)}
-
     </div>
-  
-);
+  );
 }

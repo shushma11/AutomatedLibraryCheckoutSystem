@@ -34,9 +34,49 @@ public class UserService {
     @Value("${admin.secret.key}")
     private String adminSecretKey; // load from properties
 
+//    public User registerUser(SignupRequest req) {
+//        if (userRepository.existsByEmail(req.getEmail())) {
+//            throw new RuntimeException("Email already in use");
+//        }
+//
+//        Role role;
+//
+//        if ("ADMIN".equalsIgnoreCase(req.getRole())) {
+//            if (req.getSecretKey() == null || !req.getSecretKey().equals(adminSecretKey)) {
+//                throw new RuntimeException("Invalid admin secret key — access denied.");
+//            }
+//            role = Role.ADMIN;
+//        } else {
+//            role = Role.STUDENT;
+//        }
+//
+//        User user = new User(
+//                null,
+//                req.getName(),
+//                req.getEmail(),
+//                passwordEncoder.encode(req.getPassword()),
+//                role,
+//                req.getRollNo(),
+//                req.getYear(),
+//                req.getBranch(),
+//                req.getSection(),
+//                req.getRfidTagId(),
+//                null
+//        );
+//
+//        return userRepository.save(user);
+//    }
+
     public User registerUser(SignupRequest req) {
+
         if (userRepository.existsByEmail(req.getEmail())) {
             throw new RuntimeException("Email already in use");
+        }
+
+        // 🔒 Prevent duplicate RFID assignment
+        if (req.getRfidTagId() != null &&
+                userRepository.findByRfidTagId(req.getRfidTagId()).isPresent()) {
+            throw new RuntimeException("RFID already assigned to another student");
         }
 
         Role role;
@@ -66,6 +106,7 @@ public class UserService {
 
         return userRepository.save(user);
     }
+
 
     public List<UserDTO> getAllStudents() {
         List<User> students = userRepository.findByRole(Role.STUDENT);
@@ -106,16 +147,27 @@ public class UserService {
         return userRepository.findByRfidTagId(rfidTagId).isPresent();
     }
 
-    public boolean isUserInsideLibrary(String rollNo) {
+//    public boolean isUserInsideLibrary(String rollNo) {
+//
+//        // Get last RFID record for the user
+//        RfidRecord lastRecord =
+//                rfidRecordRepository
+//                        .findTopByUserRollNoOrderByEntryTimeDesc(rollNo);
+//
+//        // If last entry exists and exitTime is null → inside
+//        return lastRecord != null && lastRecord.getExitTime() == null;
+//    }
+public boolean isUserInsideLibrary(String rollNo) {
 
-        // Get last RFID record for the user
-        RfidRecord lastRecord =
-                rfidRecordRepository
-                        .findTopByUserRollNoOrderByEntryTimeDesc(rollNo);
+    User user1 =  userRepository.findByRollNo(rollNo)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // If last entry exists and exitTime is null → inside
-        return lastRecord != null && lastRecord.getExitTime() == null;
-    }
+    RfidRecord lastRecord =
+            rfidRecordRepository.findTopByUserOrderByEntryTimeDesc(user1);
+
+    return lastRecord != null && lastRecord.getExitTime() == null;
+}
+
 
 
 }

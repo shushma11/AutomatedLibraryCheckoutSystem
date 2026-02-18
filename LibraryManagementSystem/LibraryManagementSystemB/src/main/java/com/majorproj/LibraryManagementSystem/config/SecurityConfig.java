@@ -58,8 +58,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**",
+                                "/api/rfid/**",
                                 "/api/books/**",
                                 "/api/issued/**",
+                                "/api/library/**",
                                 "/api/transactions/**",
                                 "/api/user/**",
                                 "/api/user/is-inside-library/**",

@@ -1,3 +1,218 @@
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { Html5QrcodeScanner } from "html5-qrcode";
+
+// export default function BookScan() {
+//   const [isInsideLibrary, setIsInsideLibrary] = useState(false);
+//   const [showScanner, setShowScanner] = useState(false);
+//   const [scannedBook, setScannedBook] = useState(null);
+//   const [loading, setLoading] = useState(false);
+//   const [error, setError] = useState("");
+
+//   // 🔹 Get roll number (from login)
+//   const rollNo = localStorage.getItem("rollNo");
+//   console.log(rollNo);
+
+//   // 🔹 Check RFID library entry
+//   useEffect(() => {
+//     async function checkLibraryStatus() {
+//       try {
+
+//         const res = await axios.post(
+//           "http://localhost:8080/api/user/is-inside-library",
+//           { "rollNo":rollNo  }
+//         );
+//         console.log("Afterr");
+//         console.log(res.data);
+//         setIsInsideLibrary(res.data.insideLibrary);
+//       } catch {
+//         setError("Unable to verify library entry");
+//       }
+//     }
+//     checkLibraryStatus();
+//   }, [rollNo]);
+
+//   // 🔹 Start camera scanner
+//   useEffect(() => {
+//     if (!showScanner) return;
+
+//     const scanner = new Html5QrcodeScanner(
+//       "reader",
+//       {
+//         fps: 10,
+//         qrbox: 250,
+//         rememberLastUsedCamera: true,
+//       },
+//       false
+//     );
+
+//     scanner.render(
+//       (isbn) => {
+//         scanner.clear();
+//         handleScan(isbn);
+//       },
+//       () => {}
+//     );
+
+//     return () => {
+//       scanner.clear().catch(() => {});
+//     };
+//   }, [showScanner]);
+
+//   // 🔹 Scan handler
+//   async function handleScan(isbn) {
+//     console.log("ISBN:" + isbn);
+//     setLoading(true);
+//     setError("");
+
+//     try {
+//       const res = await axios.post(
+//         "http://localhost:8080/api/books/scan",
+//         {
+//           isbn,
+//           rollNo,
+//         }
+//       );
+//       console.log("Scanned Book details");
+//       console.log(scannedBook);
+//       setScannedBook(res.data);
+//     } catch (err) {
+//       setError(
+//         err.response?.data?.message || "Book not found or unavailable"
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   }
+
+
+
+
+
+
+
+//   async function confirmIssue() {
+//   setLoading(true);
+//   setError("");
+
+//   try {
+//     const userId = localStorage.getItem("userId"); // store this at login
+//     const rollNumber = localStorage.getItem("rollNo");
+
+//     const res = await axios.post(
+//       "http://localhost:8080/api/issued/issue",
+//       {
+//         userId: userId,
+//         bookId: scannedBook.id,   // book from scan API
+//         rollNumber: rollNumber
+//       }
+//     );
+
+//     alert(res.data);
+//     setScannedBook(null);
+//     setShowScanner(false);
+
+//   } catch (err) {
+//     console.log(err);
+//     setError(err.response?.data || "Failed to issue book");
+//   } finally {
+//     setLoading(false);
+//   }
+// }
+
+
+//   return (
+//     <div className="container py-4">
+//       <div className="row justify-content-center">
+//         <div className="col-md-6">
+
+//           <div className="card shadow">
+//             <div className="card-body text-center">
+
+//               <h3 className="mb-3">📚 Scan Book</h3>
+
+            
+//               {!isInsideLibrary && (
+//   <div className="alert alert-danger">
+//     Please scan your RFID at library entrance first.
+//   </div>
+// )}
+
+// {isInsideLibrary && (
+//   <button
+//     className="btn btn-primary"
+//     onClick={() => setShowScanner(true)}
+//   >
+//     Scan Book QR
+//   </button>
+// )}
+
+
+//               {showScanner && (
+//                 <div id="reader" className="my-3"></div>
+//               )}
+
+//               {loading && (
+//                 <div className="spinner-border text-primary my-2"></div>
+//               )}
+
+//               {error && (
+//                 <div className="alert alert-danger mt-2">{error}</div>
+//               )}
+
+//               {/* 🔹 Confirmation */}
+//               {scannedBook && (
+//                 <div className="card mt-3">
+//                   <div className="card-body">
+//                     <h5 className="card-title">Confirm Issue</h5>
+
+//                     <p><b>Title:</b> {scannedBook.title}</p>
+//                     <p><b>Author:</b> {scannedBook.author}</p>
+//                     <p><b>ISBN:</b> {scannedBook.isbn}</p>
+//                     <p><b>Available:</b> {scannedBook.availableCount}</p>
+
+//                     <div className="d-flex gap-2">
+//                       <button
+//                         className="btn btn-success w-100"
+//                         onClick={confirmIssue}
+//                       >
+//                         Confirm
+//                       </button>
+//                       <button
+//                         className="btn btn-outline-danger w-100"
+//                         onClick={() => setScannedBook(null)}
+//                       >
+//                         Cancel
+//                       </button>
+//                     </div>
+//                   </div>
+//                 </div>
+//               )}
+
+//             </div>
+//           </div>
+
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Html5QrcodeScanner } from "html5-qrcode";
@@ -9,38 +224,40 @@ export default function BookScan() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // 🔹 Get roll number (from login)
   const rollNo = localStorage.getItem("rollNo");
-  console.log(rollNo);
 
-  // 🔹 Check RFID library entry
-  useEffect(() => {
-    async function checkLibraryStatus() {
-      try {
-
-
-      //   const res = await axios.post(
-      //   "http://localhost:8080/api/books/scan",
-      //   {
-      //     isbn,
-      //     rollNo,
-      //   }
-      // );
-        const res = await axios.post(
-          "http://localhost:8080/api/user/is-inside-library",
-          { "rollNo":rollNo  }
-        );
-        console.log("Afterr");
-        console.log(res.data);
-        setIsInsideLibrary(res.data.insideLibrary);
-      } catch {
-        setError("Unable to verify library entry");
-      }
+  /* 🔹 Check RFID library entry (AUTO REFRESH) */
+  const checkLibraryStatus = async () => {
+    try {
+      const res = await axios.post(
+        "http://localhost:8080/api/user/is-inside-library",
+        { rollNo }
+      );
+      setIsInsideLibrary(res.data.insideLibrary);
+    } catch {
+      setError("Unable to verify library entry");
     }
+  };
+
+  useEffect(() => {
     checkLibraryStatus();
+
+    // 🔁 Auto refresh every 5 seconds
+    const interval = setInterval(checkLibraryStatus, 5000);
+
+    // 🔁 Refresh when tab becomes active
+    const handleVisibility = () => {
+      if (!document.hidden) checkLibraryStatus();
+    };
+    document.addEventListener("visibilitychange", handleVisibility);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [rollNo]);
 
-  // 🔹 Start camera scanner
+  /* 🔹 Start QR scanner */
   useEffect(() => {
     if (!showScanner) return;
 
@@ -67,145 +284,142 @@ export default function BookScan() {
     };
   }, [showScanner]);
 
-  // 🔹 Scan handler
+  /* 🔹 Scan handler */
   async function handleScan(isbn) {
-    console.log("ISBN:" + isbn);
     setLoading(true);
     setError("");
 
     try {
       const res = await axios.post(
         "http://localhost:8080/api/books/scan",
-        {
-          isbn,
-          rollNo,
-        }
+        { isbn, rollNo }
       );
-      console.log("Scanned Book details");
-      console.log(scannedBook);
       setScannedBook(res.data);
     } catch (err) {
-      setError(
-        err.response?.data?.message || "Book not found or unavailable"
-      );
+      setError(err.response?.data?.message || "Book not found or unavailable");
     } finally {
       setLoading(false);
     }
   }
 
-  // 🔹 Confirm issue
-//   async function confirmIssue() {
-//     setLoading(true);
-//     setError("");
-
-//     try {
-//       axios.post("/api/issued/issue-by-isbn", {
-//   isbn: scannedIsbn,
-//   rollNo: user.rollNo
-// });
-
-
-//       alert("Book issued successfully");
-//       setScannedBook(null);
-//       setShowScanner(false);
-//     } catch {
-//       setError("Failed to issue book");
-//     } finally {
-//       setLoading(false);
-//     }
-//   }
-
-
+  /* 🔹 Confirm Issue */
   async function confirmIssue() {
-  setLoading(true);
-  setError("");
+    setLoading(true);
+    setError("");
 
-  try {
-    const userId = localStorage.getItem("userId"); // store this at login
-    const rollNumber = localStorage.getItem("rollNo");
+    try {
+      const userId = localStorage.getItem("userId");
+      const rollNumber = localStorage.getItem("rollNo");
 
-    const res = await axios.post(
-      "http://localhost:8080/api/issued/issue",
-      {
-        userId: userId,
-        bookId: scannedBook.id,   // book from scan API
-        rollNumber: rollNumber
-      }
-    );
+      const res = await axios.post(
+        "http://localhost:8080/api/issued/issue",
+        {
+          userId,
+          bookId: scannedBook.id,
+          rollNumber,
+        }
+      );
 
-    alert(res.data);
-    setScannedBook(null);
-    setShowScanner(false);
-
-  } catch (err) {
-    console.log(err);
-    setError(err.response?.data || "Failed to issue book");
-  } finally {
-    setLoading(false);
+      alert(res.data);
+      setScannedBook(null);
+      setShowScanner(false);
+    } catch (err) {
+      setError(err.response?.data || "Failed to issue book");
+    } finally {
+      setLoading(false);
+    }
   }
-}
-
 
   return (
-    <div className="container py-4">
+    <div className="container py-5">
       <div className="row justify-content-center">
         <div className="col-md-6">
 
-          <div className="card shadow">
-            <div className="card-body text-center">
+          <div className="card shadow-lg border-0 rounded-4">
+            <div className="card-body p-4 text-center">
 
-              <h3 className="mb-3">📚 Scan Book</h3>
+              <h3 className="fw-bold mb-3">📚 Book Issuing</h3>
+              <p className="text-muted mb-4">
+                Step 1: Enter library → Step 2: Scan book QR
+              </p>
 
+              {/* Library Status */}
               {!isInsideLibrary && (
                 <div className="alert alert-danger">
-                  You must enter the library to issue a book.
+                  🚫 You are not inside the library.<br />
+                  Please scan your RFID at the entrance.
                 </div>
               )}
 
               {isInsideLibrary && !showScanner && (
+                <div className="alert alert-success">
+                  ✅ Library entry verified. You may scan a book.
+                </div>
+              )}
+
+              {/* Scan Button */}
+              {isInsideLibrary && !showScanner && (
                 <button
-                  className="btn btn-primary w-100"
+                  className="btn btn-primary btn-lg w-100"
                   onClick={() => setShowScanner(true)}
                 >
-                  📷 Scan Book
+                  📷 Scan Book QR
                 </button>
               )}
 
+              {/* Scanner */}
               {showScanner && (
-                <div id="reader" className="my-3"></div>
+                <div className="mt-4">
+                  <div
+                    id="reader"
+                    className="border rounded p-2"
+                  ></div>
+                  <small className="text-muted d-block mt-2">
+                    Align the QR code inside the box
+                  </small>
+                </div>
               )}
 
+              {/* Loading */}
               {loading && (
-                <div className="spinner-border text-primary my-2"></div>
+                <div className="mt-3">
+                  <div className="spinner-border text-primary"></div>
+                </div>
               )}
 
+              {/* Error */}
               {error && (
-                <div className="alert alert-danger mt-2">{error}</div>
+                <div className="alert alert-danger mt-3">
+                  {error}
+                </div>
               )}
 
-              {/* 🔹 Confirmation */}
+              {/* Confirm Card */}
               {scannedBook && (
-                <div className="card mt-3">
-                  <div className="card-body">
-                    <h5 className="card-title">Confirm Issue</h5>
+                <div className="card mt-4 border-0 shadow-sm">
+                  <div className="card-body text-start">
+                    <h5 className="fw-bold mb-3 text-center">
+                      📖 Confirm Book Issue
+                    </h5>
 
                     <p><b>Title:</b> {scannedBook.title}</p>
                     <p><b>Author:</b> {scannedBook.author}</p>
                     <p><b>ISBN:</b> {scannedBook.isbn}</p>
                     <p><b>Available:</b> {scannedBook.availableCount}</p>
 
-                    <div className="d-flex gap-2">
+                    <div className="d-flex gap-2 mt-3">
                       <button
                         className="btn btn-success w-100"
                         onClick={confirmIssue}
+                        disabled={loading}
                       >
-                        Confirm
+                        ✅ Confirm
                       </button>
                       <button
                         className="btn btn-outline-danger w-100"
                         onClick={() => setScannedBook(null)}
                       >
-                        Cancel
+                        ❌ Cancel
                       </button>
                     </div>
                   </div>

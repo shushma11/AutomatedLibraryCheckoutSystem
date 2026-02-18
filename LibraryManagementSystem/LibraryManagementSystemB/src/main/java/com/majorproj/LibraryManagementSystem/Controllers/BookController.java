@@ -88,6 +88,12 @@ public class BookController {
 
     @PostMapping("/scan")
     public ResponseEntity<?> scanBook(@RequestBody ScanBookRequest request) {
+//        boolean inside = userService.isUserInsideLibrary(req.getRollNo());
+//
+//        if (!inside) {
+//            return ResponseEntity.badRequest()
+//                    .body(Map.of("message", "User not inside library"));
+//        }
 
         Book book = bookService.getBookByIsbn(request.getIsbn())
                 .orElseThrow(() ->

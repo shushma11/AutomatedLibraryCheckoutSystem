@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import Welcome from "./Components/Welcome";
-import LoginSignup from "./Components/LoginSignup";
+import LoginSignup from "./Components/SignupPage";
 import AdminDashboard from "./Components/AdminDashboard";
 import StudentDashboard from "./Components/StudentDashboard";
 import AllBooksPage from "./Components/AllBooksPage";
-import LibraryInfo from "./Components/LibraryInfo";
+// import LibraryInfo from "./Components/LibraryInfo";
 import Navbar from "./Components/Navbar";
 import IssuedBooks from "./Components/IssuedBooks";
-import LoginDashboard from "./Components/LoginDashboard";
+import LoginDashboard from "./Components/LoginPage";
 import StudentList from "./Components/StudentList";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import TransactionHistory from "./Components/TransactionHistory";
 import axios from "axios";
 import BookScan from "./Components/BookScan";
 import ReturnBook from "./Components/ReturnBook";
-
+import LibraryInfo from "./Components/LibraryInfo";
 function App() {
   const [role, setRole] = useState(localStorage.getItem("role"));
   const [token, setToken] = useState(localStorage.getItem("token"));
@@ -106,6 +106,7 @@ function App() {
 } />
 
       <Route path="/return-book" element={<ReturnBook />} />
+      <Route path="/library-info" element={<LibraryInfo/>}/>
 
       </Routes>
     </Router>
